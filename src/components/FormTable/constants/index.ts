@@ -1,0 +1,16 @@
+export const FIELD_TYPES = {
+  input: 'input',
+  select: 'select',
+  datePicker: 'datePicker',
+  inputNumber: 'inputNumber',
+  switch: 'switch',
+  checkbox: 'checkbox',
+  autoComplete: 'autoComplete',
+  cascader: 'cascader',
+  timePicker: 'timePicker',
+  treeSelect: 'treeSelect',
+  upload: 'upload',
+  rate: 'rate',
+  text: 'text',
+  operation: 'operation',
+} as const
