@@ -1,8 +1,8 @@
 {
   "name": "antd-formtable",
-  "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -11,6 +11,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "antd": "^5.11.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -30,6 +31,6 @@
     "jsdom": "^22.1.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
-    "vitest": "^0.34.6"
+    "vitest": "^1.0.1"
   }
 }

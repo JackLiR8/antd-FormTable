@@ -1,33 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Button, Form } from 'antd'
 import './App.css'
+import type { FormTableColumn } from './components/FormTable'
+import FormTable from './components/FormTable'
+
+const columns: FormTableColumn[] = [
+  {
+    fieldType: 'input',
+    dataIndex: 'name',
+    title: 'Name',
+    fieldProps: {
+      placeholder: 'your name',
+    },
+  },
+  {
+
+    fieldType: 'inputNumber',
+    dataIndex: 'age',
+    title: 'Age',
+    fieldProps: {
+      placeholder: 'your age',
+    },
+  },
+  {
+    fieldType: 'select',
+    dataIndex: 'gender',
+    title: 'Gender',
+    fieldProps: {
+      placeholder: 'your gender',
+      options: [
+        { label: 'male', value: 1 },
+        { label: 'female', value: 2 },
+        { label: 'secret', value: 0 },
+      ],
+    },
+  },
+  {
+    fieldType: 'input',
+    dataIndex: 'address',
+    title: 'Address',
+    fieldProps: {
+      placeholder: 'your address',
+    },
+  },
+  {
+    title: 'Operation',
+    fieldType: 'operation',
+    dataIndex: 'operation',
+  },
+]
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [form] = Form.useForm()
+  const handleSubmit = async () => {
+    await form.validateFields()
+  }
 
   return (
     <>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          users: [
+            { name: 'jack', age: undefined, gender: undefined, address: 'street 1' },
+            { name: 'curry', age: undefined, gender: undefined },
+            { name: 'lucy', age: undefined, gender: undefined, address: 'street 2' },
+          ],
+        }}
+      >
+        <Form.Item label="users">
+          <FormTable
+            name="users"
+            columns={columns}
+          />
+        </Form.Item>
+      </Form>
+
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <Button type="primary" onClick={handleSubmit}>
+          Submit
+        </Button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }

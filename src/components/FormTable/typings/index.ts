@@ -1,27 +1,34 @@
-import type { AutoCompleteProps, CascaderProps, CheckboxProps, DatePickerProps, FormInstance, FormRule, InputNumberProps, InputProps, RateProps, SelectProps, SwitchProps, TableColumnType, TableProps, TimePickerProps, TreeSelectProps, UploadProps } from 'antd'
-import type { NamePath } from 'antd/es/form/interface'
+import type { AutoCompleteProps, CascaderProps, CheckboxProps, DatePickerProps, FormInstance, FormListFieldData, FormListOperation, FormRule, InputNumberProps, InputProps, RateProps, SelectProps, SwitchProps, TableColumnType, TableProps, TimePickerProps, TreeSelectProps, UploadProps } from 'antd'
 import type { ReactNode } from 'react'
+import type { NamePath } from 'antd/es/form/interface'
 import type { FIELD_TYPES } from '../constants'
 import type { ValuesOf } from './utils'
 
 export type FieldTypes = ValuesOf<typeof FIELD_TYPES>
-export type FormTableProps<T = any> = Omit<TableProps<T>, 'render' | 'columns'> & {
+export type FormTableProps<R = any> = {
   name: NamePath
   parentName?: NamePath
   form?: FormInstance
-  columns: FormTableColumn<T>[]
-  initialValue?: unknown
+  columns: FormTableColumn<R>[]
+  initialValue?: any[]
   max?: number
   min?: number
   empty?: ReactNode
   disabled?: boolean
+} & Omit<TableProps<R>, 'render' | 'columns'>
+
+// eslint-disable-next-line ts/consistent-type-definitions
+export type FormTableRecordField = {
+  field: FormListFieldData
+  operation: FormListOperation
 }
 
-export type FormTableColumn<T = any> = Omit<TableColumnType<T>, 'render'> & {
+export type FormTableColumn<R = any> = {
   title: ReactNode
-  dataIndex?: string
+  dataIndex: string
   initialValue?: unknown
-  rules?: FormRule[] | ((record: T, index: number) => FormRule[])
+  rules?: FormRule[] | ((record: R, index: number) => FormRule[])
+  render?: (value: any, record: R, index: number, recordField: FormTableRecordField) => ReactNode
 } & (
   // | { fieldType: typeof FIELD_TYPES.index, fieldProps?: never }
   | { fieldType: typeof FIELD_TYPES.text, fieldProps?: never }
@@ -40,9 +47,10 @@ export type FormTableColumn<T = any> = Omit<TableColumnType<T>, 'render'> & {
   | {
     fieldType: typeof FIELD_TYPES.operation
     fieldProps?: {
-      hideAddButton?: boolean
-      hideRemoveButton?: boolean
+      disabled?: boolean
+      addButton?: ReactNode
+      removeButton?: ReactNode
     }
   }
-  | { fieldType?: never, fieldProps?: never, hideAddButton?: never, hideRemoveButton?: never }
-)
+  | { fieldType?: never, fieldProps?: never, addButton?: never, removeButton?: never }
+) & Omit<TableColumnType<R>, 'render' | 'dataIndex'>

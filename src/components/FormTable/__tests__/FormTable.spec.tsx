@@ -19,6 +19,9 @@ const columns: FormTableColumn[] = [
     dataIndex: 'age',
     title: 'Age',
     width: 100,
+    fieldProps: {
+      placeholder: 'your age',
+    },
   },
   {
     fieldType: 'select',
@@ -26,6 +29,7 @@ const columns: FormTableColumn[] = [
     title: 'Gender',
     width: 100,
     fieldProps: {
+      placeholder: 'your gender',
       options: [
         { label: 'male', value: 1 },
         { label: 'female', value: 2 },
@@ -38,27 +42,30 @@ const columns: FormTableColumn[] = [
     dataIndex: 'address',
     title: 'Address',
     width: 100,
+    fieldProps: {
+      placeholder: 'your address',
+    },
   },
 ]
 
 describe('formTable', () => {
-  it('should render the component', async () => {
-    const [form] = Form.useForm()
+  it('should render the component correctly', async () => {
     render(
       <Form
-        form={form}
         initialValues={{
           users: [
             { name: 'jack', age: 20, gender: 1, address: 'street 1' },
-            { name: 'curry', age: 12, gender: 1 },
-            { name: 'lucy', age: 18, gender: 2, address: 'street 2' },
+            { name: 'curry', age: 30, gender: 2 },
+            { name: 'lucy', age: 18, gender: 1, address: 'street 2' },
           ],
         }}
       >
-        <FormTable name="users" columns={columns} form={form} />
+        <FormTable name="users" columns={columns} />
       </Form>,
     )
 
     expect(screen.queryAllByPlaceholderText('your name')).toHaveLength(3)
+    expect(screen.queryAllByPlaceholderText('your age')).toHaveLength(3)
+    expect(screen.queryAllByPlaceholderText('your address')).toHaveLength(3)
   })
 })
