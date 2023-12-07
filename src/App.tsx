@@ -3,54 +3,62 @@ import './App.css'
 import type { FormTableColumn } from './components/FormTable'
 import FormTable from './components/FormTable'
 
-const columns: FormTableColumn[] = [
-  {
-    fieldType: 'input',
-    dataIndex: 'name',
-    title: 'Name',
-    fieldProps: {
-      placeholder: 'your name',
-    },
-  },
-  {
-
-    fieldType: 'inputNumber',
-    dataIndex: 'age',
-    title: 'Age',
-    fieldProps: {
-      placeholder: 'your age',
-    },
-  },
-  {
-    fieldType: 'select',
-    dataIndex: 'gender',
-    title: 'Gender',
-    fieldProps: {
-      placeholder: 'your gender',
-      options: [
-        { label: 'male', value: 1 },
-        { label: 'female', value: 2 },
-        { label: 'secret', value: 0 },
-      ],
-    },
-  },
-  {
-    fieldType: 'input',
-    dataIndex: 'address',
-    title: 'Address',
-    fieldProps: {
-      placeholder: 'your address',
-    },
-  },
-  {
-    title: 'Operation',
-    fieldType: 'operation',
-    dataIndex: 'operation',
-  },
-]
-
 function App() {
   const [form] = Form.useForm()
+
+  const columns: FormTableColumn[] = [
+    {
+      fieldType: 'input',
+      dataIndex: 'name',
+      title: 'Name',
+      fieldProps: {
+        placeholder: 'your name',
+      },
+    },
+    {
+
+      fieldType: 'inputNumber',
+      dataIndex: 'age',
+      title: 'Age',
+      fieldProps: {
+        placeholder: 'your age',
+      },
+    },
+    {
+      fieldType: 'select',
+      dataIndex: 'gender',
+      title: 'Gender',
+      fieldProps: (record, index) => ({
+        placeholder: 'your gender',
+        options: [
+          { label: 'male', value: 1 },
+          { label: 'female', value: 2 },
+          { label: 'secret', value: 0 },
+        ],
+        onSelect: (value, option) => {
+          form.setFieldValue(['users', index, 'genderText'], option.label)
+        },
+      }),
+    },
+    {
+      title: 'gender',
+      dataIndex: 'genderText',
+    },
+    {
+      fieldType: 'input',
+      dataIndex: 'address',
+      title: 'Address',
+      fieldProps: {
+        placeholder: 'your address',
+      },
+    },
+    {
+      title: 'Operation',
+      fieldType: 'operation',
+      dataIndex: 'operation',
+    },
+  ]
+
   const handleSubmit = async () => {
     await form.validateFields()
   }
