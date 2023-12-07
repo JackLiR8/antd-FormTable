@@ -1,4 +1,23 @@
-import type { AutoCompleteProps, CascaderProps, CheckboxProps, DatePickerProps, FormInstance, FormListFieldData, FormListOperation, FormRule, InputNumberProps, InputProps, RateProps, SelectProps, SwitchProps, TableColumnType, TableProps, TimePickerProps, TreeSelectProps, UploadProps } from 'antd'
+import type {
+  AutoCompleteProps,
+  CascaderProps,
+  CheckboxProps,
+  DatePickerProps,
+  FormInstance,
+  FormListFieldData,
+  FormListOperation,
+  FormRule,
+  InputNumberProps,
+  InputProps,
+  RateProps,
+  SelectProps,
+  SwitchProps,
+  TableColumnType,
+  TableProps,
+  TimePickerProps,
+  TreeSelectProps,
+  UploadProps,
+} from 'antd'
 import type { ReactNode } from 'react'
 import type { NamePath } from 'antd/es/form/interface'
 import type { FIELD_TYPES } from '../constants'
@@ -23,6 +42,10 @@ export type FormTableRecordField = {
   operation: FormListOperation
 }
 
+type FieldProps<T> =
+  | T
+  | ((record: any, index: number, recordField: FormTableRecordField) => T)
+
 export type FormTableColumn<R = any> = {
   title: ReactNode
   dataIndex: string
@@ -31,26 +54,76 @@ export type FormTableColumn<R = any> = {
   render?: (value: any, record: R, index: number, recordField: FormTableRecordField) => ReactNode
 } & (
   // | { fieldType: typeof FIELD_TYPES.index, fieldProps?: never }
-  | { fieldType: typeof FIELD_TYPES.text, fieldProps?: never }
-  | { fieldType: typeof FIELD_TYPES.input, fieldProps?: InputProps }
-  | { fieldType: typeof FIELD_TYPES.select, fieldProps?: SelectProps }
-  | { fieldType: typeof FIELD_TYPES.inputNumber, fieldProps?: InputNumberProps }
-  | { fieldType: typeof FIELD_TYPES.datePicker, fieldProps?: DatePickerProps }
-  | { fieldType: typeof FIELD_TYPES.switch, fieldProps?: SwitchProps }
-  | { fieldType: typeof FIELD_TYPES.checkbox, fieldProps?: CheckboxProps }
-  | { fieldType: typeof FIELD_TYPES.autoComplete, fieldProps?: AutoCompleteProps }
-  | { fieldType: typeof FIELD_TYPES.cascader, fieldProps?: CascaderProps }
-  | { fieldType: typeof FIELD_TYPES.timePicker, fieldProps?: TimePickerProps }
-  | { fieldType: typeof FIELD_TYPES.treeSelect, fieldProps?: TreeSelectProps }
-  | { fieldType: typeof FIELD_TYPES.upload, fieldProps?: UploadProps }
-  | { fieldType: typeof FIELD_TYPES.rate, fieldProps?: RateProps }
+  | {
+    fieldType: typeof FIELD_TYPES.input
+    fieldProps?: FieldProps<InputProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.select
+    fieldProps?: FieldProps<SelectProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.inputNumber
+    fieldProps?: FieldProps<InputNumberProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.datePicker
+    fieldProps?: FieldProps<DatePickerProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.switch
+    fieldProps?: FieldProps<SwitchProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.checkbox
+    fieldProps?: FieldProps<CheckboxProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.autoComplete
+    fieldProps?: FieldProps<AutoCompleteProps
+    >
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.cascader
+    fieldProps?: FieldProps<CascaderProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.timePicker
+    fieldProps?: FieldProps<TimePickerProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.treeSelect
+    fieldProps?: FieldProps<TreeSelectProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.upload
+    fieldProps?: FieldProps<UploadProps>
+  }
+  | {
+    fieldType: typeof FIELD_TYPES.rate
+    fieldProps?: FieldProps<RateProps>
+  }
   | {
     fieldType: typeof FIELD_TYPES.operation
-    fieldProps?: {
-      disabled?: boolean
-      addButton?: ReactNode
-      removeButton?: ReactNode
-    }
+    fieldProps?: FieldProps<OperationFieldProps>
   }
-  | { fieldType?: never, fieldProps?: never, addButton?: never, removeButton?: never }
+  | {
+    fieldType: typeof FIELD_TYPES.text
+    fieldProps?: FieldProps<TextFieldProps>
+  }
+  | {
+    fieldType?: never
+    fieldProps?: never
+  }
 ) & Omit<TableColumnType<R>, 'render' | 'dataIndex'>
+
+export interface TextFieldProps {
+  disabled?: boolean
+  ellipsis?: boolean
+}
+
+export interface OperationFieldProps {
+  disabled?: boolean
+  addButton?: ReactNode
+  removeButton?: ReactNode
+}

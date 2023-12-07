@@ -7,11 +7,12 @@ import type { FormTableColumn, FormTableProps } from './typings'
 import { FIELD_TYPES } from './constants'
 import { createColumnRenderer } from './models/ColumnRenderer'
 import './style/index.css'
+import { compositeNamePath } from './utils'
 
 export * from './typings'
 
 export default function FormTable<R extends AnyObject = AnyObject>(props: FormTableProps<R>) {
-  const { name, form, columns, initialValue, disabled } = props
+  const { name, parentName, form, columns, initialValue, disabled } = props
 
   const tableData = Form.useWatch(name, form)
 
@@ -29,11 +30,10 @@ export default function FormTable<R extends AnyObject = AnyObject>(props: FormTa
 
     return columns.map((column) => {
       const {
-        dataIndex,
         rules,
         render,
         fieldType = FIELD_TYPES.text,
-        fieldProps,
+        fieldProps = {},
         ...columnPropsRest
       } = column
 
@@ -47,20 +47,29 @@ export default function FormTable<R extends AnyObject = AnyObject>(props: FormTa
         if (typeof render === 'function')
           return render(text, record, index, recordField)
 
+        const normalizedFieldProps = typeof fieldProps === 'function'
+          ? fieldProps(record, index, recordField)
+          : fieldProps
+
         const columnRenderer = createColumnRenderer(
           fieldType,
-          { rowInitialValues },
+          {
+            rowInitialValues,
+            recordField,
+            rowIndex: index,
+            tableNamePath: compositeNamePath(parentName, name),
+            column: {
+              ...column,
+              rules: normalizedRules,
+              fieldProps: {
+                ...normalizedFieldProps,
+                disabled: normalizedFieldProps?.disabled ?? disabled,
+              },
+            },
+          },
         )
 
-        const normalizedFieldProps = {
-          ...fieldProps,
-          disabled: fieldProps?.disabled ?? disabled,
-        }
-        return columnRenderer.render({
-          name: [index, dataIndex],
-          rules: normalizedRules,
-          fieldsProps: normalizedFieldProps,
-        })
+        return columnRenderer.render()
       }
 
       return {

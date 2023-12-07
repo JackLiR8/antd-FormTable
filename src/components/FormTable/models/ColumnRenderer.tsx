@@ -1,111 +1,151 @@
-import type { FormRule } from 'antd'
+import type { InputNumberProps, InputProps, SelectProps } from 'antd'
 import { Button, Form, Input, InputNumber, Select, Space } from 'antd'
 import type { ReactNode } from 'react'
 import type { NamePath } from 'antd/es/form/interface'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import type { Rule } from 'antd/es/form'
 import { FIELD_TYPES } from '../constants'
+import type {
+  FieldTypes,
+  FormTableColumn,
+  FormTableRecordField,
+  OperationFieldProps,
+  TextFieldProps,
+} from '..'
+import { compositeNamePath } from '../utils'
+
+type NormalizedColumn = Omit<FormTableColumn, 'rules'> & {
+  rules?: Rule[]
+}
+
+export interface ColumnRendererContext {
+  column: NormalizedColumn
+  rowIndex: number
+  rowInitialValues?: any
+  tableNamePath: NamePath
+  recordField: FormTableRecordField
+}
 
 // factory method
-export function createColumnRenderer(type: string, options?: {
-  rowInitialValues?: any
-}) {
+export function createColumnRenderer(type: string, context: ColumnRendererContext) {
   switch (type) {
     case FIELD_TYPES.text:
-      return new TextColumnRenderer()
+      return new TextColumnRenderer(context)
     case FIELD_TYPES.input:
-      return new InputColumnRenderer()
+      return new InputColumnRenderer(context)
     case FIELD_TYPES.inputNumber:
-      return new InputNumberColumnRenderer()
+      return new InputNumberColumnRenderer(context)
     case FIELD_TYPES.select:
-      return new SelectColumnRenderer()
+      return new SelectColumnRenderer(context)
     case FIELD_TYPES.operation:
-      return new OperationColumnRenderer(options?.rowInitialValues)
+      return new OperationColumnRenderer(context)
     default:
       throw new Error('Invalid type')
   }
 }
 
-interface RenderArgs {
-  name: NamePath
-  rules: FormRule[] | undefined
-  fieldsProps: any
-}
-type RenderFieldArgs = Pick<RenderArgs, 'fieldsProps'>
+export abstract class ColumnRenderer<FieldProps> {
+  abstract type: FieldTypes
+  renderContext: ColumnRendererContext
 
-export abstract class ColumnRenderer {
-  abstract type: string
+  constructor(renderContext: ColumnRendererContext) {
+    this.renderContext = renderContext
+  }
 
-  render({ name, rules, fieldsProps }: RenderArgs): ReactNode {
-    if (this.type === FIELD_TYPES.text) {
-      return this.renderField({
-        fieldsProps,
-      })
-    }
+  get column() {
+    return this.renderContext.column
+  }
+
+  get fieldProps(): FieldProps {
+    return this.column.fieldProps as FieldProps
+  }
+
+  get fieldNameInFormList() {
+    return [this.renderContext.rowIndex, this.column.dataIndex]
+  }
+
+  render(): ReactNode {
+    const column = this.column
+
+    if (this.type === FIELD_TYPES.text)
+      return this.renderField()
 
     return (
-      <Form.Item name={name} rules={rules}>
-        {this.renderField({
-          fieldsProps,
-        })}
+      <Form.Item name={this.fieldNameInFormList} rules={column.rules}>
+        {this.renderField()}
       </Form.Item>
     )
   }
 
-  abstract renderField(args: RenderFieldArgs): ReactNode
+  abstract renderField(): ReactNode
 }
 
-export class TextColumnRenderer extends ColumnRenderer {
+export class TextColumnRenderer extends ColumnRenderer<TextFieldProps> {
   type = FIELD_TYPES.text
 
   renderField() {
-    return <div>hello</div> // FIXME
+    const { ellipsis } = this.fieldProps
+    return (
+      <Form.Item shouldUpdate>
+        {(form) => {
+          const namePath = compositeNamePath(this.renderContext.tableNamePath, this.fieldNameInFormList)
+          const value = form.getFieldValue(namePath)
+
+          return (
+            <div
+              className={ellipsis ? 'text-ellipsis' : ''}
+              title={value}
+            >
+              {value}
+            </div>
+          )
+        }}
+      </Form.Item>
+    )
   }
 }
 
 // input
-export class InputColumnRenderer extends ColumnRenderer {
+export class InputColumnRenderer extends ColumnRenderer<InputProps> {
   type = FIELD_TYPES.input
 
-  renderField({ fieldsProps }: RenderFieldArgs) {
+  renderField() {
     return (
-      <Input {...fieldsProps} />
+      <Input {...this.fieldProps} />
     )
   }
 }
 
 // inputNumber
-export class InputNumberColumnRenderer extends ColumnRenderer {
+export class InputNumberColumnRenderer extends ColumnRenderer<InputNumberProps> {
   type = FIELD_TYPES.inputNumber
 
-  renderField({ fieldsProps }: RenderFieldArgs) {
+  renderField() {
     return (
-      <InputNumber {...fieldsProps} />
+      <InputNumber {...this.fieldProps} />
     )
   }
 }
 
 // select
-export class SelectColumnRenderer extends ColumnRenderer {
+export class SelectColumnRenderer extends ColumnRenderer<SelectProps> {
   type = FIELD_TYPES.select
 
-  renderField({ fieldsProps }: RenderFieldArgs) {
+  renderField() {
     return (
-      <Select {...fieldsProps} />
+      <Select {...this.fieldProps} />
     )
   }
 }
 
-export class OperationColumnRenderer extends ColumnRenderer {
+export class OperationColumnRenderer extends ColumnRenderer<OperationFieldProps> {
   type = FIELD_TYPES.operation
-  rowInitialValues: any
 
-  constructor(rowInitialValues: any) {
-    super()
-    this.rowInitialValues = rowInitialValues
-  }
+  renderField() {
+    const { addButton, removeButton, disabled } = this.fieldProps
+    const { rowIndex, rowInitialValues, recordField } = this.renderContext
+    const { operation } = recordField
 
-  renderField({ fieldsProps }: RenderFieldArgs) {
-    const { addButton, removeButton, disabled } = fieldsProps
     return (
       <Space>
         {
@@ -118,7 +158,7 @@ export class OperationColumnRenderer extends ColumnRenderer {
                 icon={<PlusOutlined />}
                 size="small"
                 onClick={() => {
-                  // TODO
+                  operation.add(rowInitialValues, rowIndex + 1)
                 }}
                 disabled={disabled}
               />
@@ -135,7 +175,7 @@ export class OperationColumnRenderer extends ColumnRenderer {
                 icon={<MinusOutlined />}
                 size="small"
                 onClick={() => {
-                // TODO
+                  operation.remove(rowIndex)
                 }}
                 disabled={disabled}
               />
