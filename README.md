@@ -11,16 +11,16 @@
   - ✅ `input` - Input field
   - ✅ `select` - Select field
   - ✅ `inputNumber` - InputNumber field
-  - 🚧 `switch` - Switch field
-  - 🚧 `checkbox` - Checkbox field
-  - 🚧 `autoComplete` - AutoComplete field
-  - 🚧 `cascader` - Cascader field
-  - 🚧 `timePicker` - TimePicker field
-  - 🚧 `treeSelect` - TreeSelect field
-  - 🚧 `upload` - Upload field
-  - 🚧 `rate` - Rate field
-  - 🚧 `text` - Text field
-  - 🚧 `operation` - Operation field
+  - ✅ `switch` - Switch field
+  - ✅ `checkbox` - Checkbox field
+  - ✅ `autoComplete` - AutoComplete field
+  - ✅ `cascader` - Cascader field
+  - ✅ `timePicker` - TimePicker field
+  - ✅ `treeSelect` - TreeSelect field
+  - ✅ `upload` - Upload field
+  - ✅ `rate` - Rate field
+  - ✅ `text` - Text field
+  - ✅ `operation` - Operation field
 
 **Column Field Features**
   - ✅ `disabled` - Field disabled, will inherit from `FormTable` if not specified
