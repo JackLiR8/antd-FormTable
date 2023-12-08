@@ -45,12 +45,54 @@ function App() {
       dataIndex: 'genderText',
     },
     {
-      fieldType: 'input',
+      fieldType: 'datePicker',
+      dataIndex: 'birthday',
+      title: 'Birthday',
+      fieldProps: {
+        placeholder: 'your birthday',
+      },
+    },
+    {
+      fieldType: 'switch',
+      dataIndex: 'isAdult',
+      title: 'Is Adult',
+      fieldProps: {
+        checkedChildren: 'yes',
+        unCheckedChildren: 'no',
+      },
+    },
+    {
+      fieldType: 'checkbox',
+      dataIndex: 'isMarried',
+      title: 'Is Married',
+      fieldProps: {
+        children: 'yes',
+      },
+    },
+    {
+      fieldType: 'autoComplete',
+      dataIndex: 'email',
+      title: 'Email',
+    },
+    {
+      fieldType: 'cascader',
       dataIndex: 'address',
       title: 'Address',
-      fieldProps: {
-        placeholder: 'your address',
-      },
+    },
+    {
+      fieldType: 'treeSelect',
+      dataIndex: 'province',
+      title: 'Province',
+    },
+    {
+      fieldType: 'upload',
+      dataIndex: 'avatar',
+      title: 'Avatar',
+    },
+    {
+      fieldType: 'rate',
+      dataIndex: 'rate',
+      title: 'Rate',
     },
     {
       title: 'Operation',

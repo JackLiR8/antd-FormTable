@@ -1,9 +1,9 @@
-import type { InputNumberProps, InputProps, SelectProps } from 'antd'
-import { Button, Form, Input, InputNumber, Select, Space } from 'antd'
+import type { AutoCompleteProps, CascaderProps, CheckboxProps, DatePickerProps, InputNumberProps, InputProps, RateProps, SelectProps, SwitchProps, TimePickerProps, TreeSelectProps, UploadProps } from 'antd'
+import { AutoComplete, Button, Cascader, Checkbox, DatePicker, Form, Input, InputNumber, Rate, Select, Space, Switch, TimePicker, TreeSelect, Upload } from 'antd'
 import type { ReactNode } from 'react'
 import type { NamePath } from 'antd/es/form/interface'
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
-import type { Rule } from 'antd/es/form'
+import { MinusOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
+import type { FormItemProps, Rule } from 'antd/es/form'
 import { FIELD_TYPES } from '../constants'
 import type {
   FieldTypes,
@@ -37,6 +37,24 @@ export function createColumnRenderer(type: string, context: ColumnRendererContex
       return new InputNumberColumnRenderer(context)
     case FIELD_TYPES.select:
       return new SelectColumnRenderer(context)
+    case FIELD_TYPES.datePicker:
+      return new DatePickerColumnRenderer(context)
+    case FIELD_TYPES.timePicker:
+      return new TimePickerColumnRenderer(context)
+    case FIELD_TYPES.switch:
+      return new SwitchColumnRenderer(context)
+    case FIELD_TYPES.checkbox:
+      return new CheckboxColumnRenderer(context)
+    case FIELD_TYPES.autoComplete:
+      return new AutoCompleteColumnRenderer(context)
+    case FIELD_TYPES.cascader:
+      return new CascaderColumnRenderer(context)
+    case FIELD_TYPES.treeSelect:
+      return new TreeSelectColumnRenderer(context)
+    case FIELD_TYPES.upload:
+      return new UploadColumnRenderer(context)
+    case FIELD_TYPES.rate:
+      return new RateColumnRenderer(context)
     case FIELD_TYPES.operation:
       return new OperationColumnRenderer(context)
     default:
@@ -47,6 +65,7 @@ export function createColumnRenderer(type: string, context: ColumnRendererContex
 export abstract class ColumnRenderer<FieldProps> {
   abstract type: FieldTypes
   renderContext: ColumnRendererContext
+  formItemProps?: FormItemProps
 
   constructor(renderContext: ColumnRendererContext) {
     this.renderContext = renderContext
@@ -71,7 +90,7 @@ export abstract class ColumnRenderer<FieldProps> {
       return this.renderField()
 
     return (
-      <Form.Item name={this.fieldNameInFormList} rules={column.rules}>
+      <Form.Item {...this.formItemProps} name={this.fieldNameInFormList} rules={column.rules}>
         {this.renderField()}
       </Form.Item>
     )
@@ -88,7 +107,10 @@ export class TextColumnRenderer extends ColumnRenderer<TextFieldProps> {
     return (
       <Form.Item shouldUpdate>
         {(form) => {
-          const namePath = compositeNamePath(this.renderContext.tableNamePath, this.fieldNameInFormList)
+          const namePath = compositeNamePath(
+            this.renderContext.tableNamePath,
+            this.fieldNameInFormList,
+          )
           const value = form.getFieldValue(namePath)
 
           return (
@@ -127,13 +149,117 @@ export class InputNumberColumnRenderer extends ColumnRenderer<InputNumberProps> 
   }
 }
 
-// select
 export class SelectColumnRenderer extends ColumnRenderer<SelectProps> {
   type = FIELD_TYPES.select
 
   renderField() {
     return (
       <Select {...this.fieldProps} />
+    )
+  }
+}
+
+export class DatePickerColumnRenderer extends ColumnRenderer<DatePickerProps> {
+  type = FIELD_TYPES.datePicker
+
+  renderField() {
+    return (
+      <DatePicker {...this.fieldProps} />
+    )
+  }
+}
+
+export class TimePickerColumnRenderer extends ColumnRenderer<TimePickerProps> {
+  type = FIELD_TYPES.timePicker
+
+  renderField() {
+    return (
+      <TimePicker {...this.fieldProps} />
+    )
+  }
+}
+
+export class SwitchColumnRenderer extends ColumnRenderer<SwitchProps> {
+  type = FIELD_TYPES.switch
+  formItemProps = {
+    valuePropName: 'checked',
+  }
+
+  renderField() {
+    return (
+      <Switch {...this.fieldProps} />
+    )
+  }
+}
+
+export class CheckboxColumnRenderer extends ColumnRenderer<CheckboxProps> {
+  type = FIELD_TYPES.checkbox
+  formItemProps = {
+    valuePropName: 'checked',
+  }
+
+  renderField() {
+    return (
+      <Checkbox {...this.fieldProps} />
+    )
+  }
+}
+
+export class AutoCompleteColumnRenderer extends ColumnRenderer<AutoCompleteProps> {
+  type = FIELD_TYPES.autoComplete
+
+  renderField() {
+    return (
+      <AutoComplete {...this.fieldProps} />
+    )
+  }
+}
+
+export class CascaderColumnRenderer extends ColumnRenderer<CascaderProps> {
+  type = FIELD_TYPES.cascader
+
+  renderField() {
+    return (
+      <Cascader {...this.fieldProps} />
+    )
+  }
+}
+
+export class TreeSelectColumnRenderer extends ColumnRenderer<TreeSelectProps> {
+  type = FIELD_TYPES.treeSelect
+
+  renderField() {
+    return (
+      <TreeSelect {...this.fieldProps} />
+    )
+  }
+}
+
+export class UploadColumnRenderer extends ColumnRenderer<UploadProps> {
+  type = FIELD_TYPES.upload
+  formItemProps = {
+    valuePropName: 'fileList',
+    // getValueFromEvent: (e: any) => {
+    //   if (Array.isArray(e)) return e
+    //   return e && e.fileList
+    // },
+  }
+
+  renderField() {
+    return (
+      <Upload {...this.fieldProps}>
+        {this.fieldProps.children ?? <UploadOutlined style={{ fontSize: 20 }} />}
+      </Upload>
+    )
+  }
+}
+
+export class RateColumnRenderer extends ColumnRenderer<RateProps> {
+  type = FIELD_TYPES.rate
+
+  renderField() {
+    return (
+      <Rate {...this.fieldProps} />
     )
   }
 }
